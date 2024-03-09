@@ -1,17 +1,8 @@
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
+using MvvmGen;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using WinRT.Interop;
+
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -26,11 +17,27 @@ namespace ExsampleWinUI
         public MainWindow()
         {
             this.InitializeComponent();
+            Handle = this;
         }
 
-        private void myButton_Click(object sender, RoutedEventArgs e)
+        public static MainWindow Handle { get; private set; }
+
+        //private void myButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    myButton.Content = "Clicked";
+        //}
+
+        private async void buttonFilePicker_Click(object sender, RoutedEventArgs e)
         {
-            myButton.Content = "Clicked";
+            Windows.Storage.Pickers.FileOpenPicker fileOpenPicker = new()
+            {
+                ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail,
+                FileTypeFilter = { ".jpg", ".jpeg", ".png", ".png", ".gif" },
+            };
+
+            nint windowHandle = WindowNative.GetWindowHandle(MainWindow.Handle);
+            InitializeWithWindow.Initialize(fileOpenPicker, windowHandle);
+            Windows.Storage.StorageFile file = await fileOpenPicker.PickSingleFileAsync();
         }
     }
 }
